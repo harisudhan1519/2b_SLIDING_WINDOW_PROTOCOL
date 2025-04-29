@@ -8,6 +8,70 @@
 5. If your frames reach the server it will send ACK signal to client
 6. Stop the Program
 ## PROGRAM
+
+```
+SERVER
+
+import socket
+s = socket.socket()
+s.bind(('localhost', 9999))
+s.listen(1)
+print("Server listening...")
+conn, addr = s.accept()
+print(f"Connected to {addr}")
+
+while True:
+    frames = conn.recv(1024).decode()
+    if not frames:
+        break
+
+    print(f"Received frames: {frames}")
+    ack_message = f"ACK for frames: {frames}"
+    conn.send(ack_message.encode())
+
+conn.close()  
+s.close()
+```
+
+```
+CLIENT
+
+import socket
+c = socket.socket()
+c.connect(('localhost', 9999))
+
+size = int(input("Enter number of frames to send: "))
+l = list(range(size))  
+print("Total frames to send:", len(l))
+s = int(input("Enter Window Size: "))
+
+i = 0
+while True:
+    while i < len(l):
+        st = i + s
+        frames_to_send = l[i:st]  
+        print(f"Sending frames: {frames_to_send}")
+        c.send(str(frames_to_send).encode())  
+
+        ack = c.recv(1024).decode()  
+        if ack:
+            print(f"Acknowledgment received: {ack}")
+            i += s  
+
+    break
+c.close()  
+```
+
 ## OUPUT
+
+SERVER
+
+![370846500-6cefbc06-b4c8-440f-8ce4-e9e9c35a4439](https://github.com/user-attachments/assets/9fb58895-2f77-4592-90fd-89a550be1fcf)
+
+CLIENT
+
+![370846589-70dfb06d-d87f-4899-ac58-b658844bf28c](https://github.com/user-attachments/assets/f7ac4007-e0d7-4223-923b-bba35d230712)
+
+
 ## RESULT
 Thus, python program to perform stop and wait protocol was successfully executed
